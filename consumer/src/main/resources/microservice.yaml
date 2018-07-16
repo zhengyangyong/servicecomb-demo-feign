@@ -1,0 +1,32 @@
+APPLICATION_ID: demo
+service_description:
+  name: consumer-client-app
+  version: 1.0.0
+servicecomb:
+  service:
+    registry:
+      address: http://127.0.0.1:30100
+  #Consumer调用超时时间设置，单位毫秒
+  request:
+    timeout: 5000
+
+  handler:
+    chain:
+      Consumer:
+        default: bizkeeper-consumer,loadbalance
+
+  #设置参见https://huaweicse.github.io/servicecomb-java-chassis-doc/zh_CN/build-provider/configuration/downgrade-strategy.html
+  circuitBreaker:
+    Consumer:
+      enabled: true
+      #熔断后多长时间恢复
+      sleepWindowInMilliseconds: 15000
+      #10秒内发生多少次失败后熔断，注意由于m2存在一个BUG，如果设置为N，实际上生效的值是N-1
+      requestVolumeThreshold: 4
+  fallback:
+    Consumer:
+      enabled: true
+  fallbackpolicy:
+    Consumer:
+      #自定义扩展的FallbackPolicy的name
+      policy: myFallbackPolicy
